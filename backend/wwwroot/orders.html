@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外卖点餐系统 · 我的订单</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="page">
+        <div class="container card">
+            <div class="nav">
+                <div class="brand">WaiMai Atelier</div>
+                <div class="nav-links">
+                    <a href="index.html" data-nav="login">登录</a>
+                    <a href="menu.html" data-nav="menu">点餐</a>
+                    <a href="orders.html" data-nav="orders">订单</a>
+                    <a href="merchant.html" data-nav="merchant">商家</a>
+                    <a href="admin.html" data-nav="admin">管理</a>
+                </div>
+            </div>
+            <div class="hero">
+                <div class="hero-copy">
+                    <span class="pill">订单中心</span>
+                    <h2 class="section-title">你的每一笔订单都清晰可见</h2>
+                    <p>这里展示最近订单、状态与商家信息。</p>
+                    <div style="margin-top: 12px; display: flex; gap: 12px;">
+                        <button class="btn" data-refresh-orders>刷新订单</button>
+                        <button class="btn secondary" data-logout>退出登录</button>
+                    </div>
+                </div>
+                <div class="card" style="padding: 18px;">
+                    <div class="notice" data-orders-notice style="display: none; margin-bottom: 12px;"></div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th>商家</th>
+                                <th>时间</th>
+                                <th>金额</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody data-orders-table></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="assets/app.js"></script>
+</body>
+</html>

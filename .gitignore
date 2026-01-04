@@ -1,0 +1,13 @@
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.pdb
+*.cache
+*.log
+*.tmp
+*.db
+*.db-shm
+*.db-wal

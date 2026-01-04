@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外卖点餐系统 · 点餐</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="page">
+        <div class="container card">
+            <div class="nav">
+                <div class="brand">WaiMai Atelier</div>
+                <div class="nav-links">
+                    <a href="index.html" data-nav="login">登录</a>
+                    <a href="menu.html" data-nav="menu">点餐</a>
+                    <a href="orders.html" data-nav="orders">订单</a>
+                    <a href="merchant.html" data-nav="merchant">商家</a>
+                    <a href="admin.html" data-nav="admin">管理</a>
+                </div>
+            </div>
+            <div class="hero">
+                <div>
+                    <span class="pill">选店 · 选菜</span>
+                    <h2 class="section-title">挑选今天的菜单</h2>
+                    <p style="color: var(--muted); margin-top: 8px;">
+                        点击商家即可加载菜单，右侧实时更新购物车。
+                    </p>
+
+                    <div style="margin-top: 18px;" class="list stagger" data-merchant-list></div>
+
+                    <h3 class="section-title" style="margin-top: 26px;">菜单列表</h3>
+                    <div style="margin-top: 14px;" class="list stagger" data-product-list></div>
+                </div>
+
+                <div class="cart card">
+                    <h3 class="section-title">购物车</h3>
+                    <div class="input-group">
+                        <label>配送地址</label>
+                        <input placeholder="请输入配送地址" data-delivery-address>
+                    </div>
+                    <div class="list" data-cart-items>
+                        <p style="color: var(--muted); margin: 0;">暂未选择菜品</p>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <span style="color: var(--muted);">合计</span>
+                        <strong data-cart-total>￥0.00</strong>
+                    </div>
+                    <div class="notice" data-menu-notice style="display: none;"></div>
+                    <button class="btn" style="margin-top: 10px;" data-order-submit>确认下单</button>
+                    <button class="btn secondary" data-logout>退出登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="assets/app.js"></script>
+</body>
+</html>
