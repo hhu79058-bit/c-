@@ -13,7 +13,7 @@
     <div class="page">
         <div class="container card">
             <div class="nav">
-                <div class="brand">WaiMai Atelier</div>
+                <div class="brand">外卖点餐系统</div>
                 <div class="nav-links">
                     <a href="index.html" data-nav="login">登录</a>
                     <a href="menu.html" data-nav="menu">点餐</a>
@@ -36,22 +36,33 @@
                     <div style="margin-top: 14px;" class="list stagger" data-product-list></div>
                 </div>
 
-                <div class="cart card">
-                    <h3 class="section-title">购物车</h3>
-                    <div class="input-group">
+                <div class="cart card cart-panel">
+                    <div class="cart-head">
+                        <div>
+                            <div class="section-title" style="margin-bottom: 4px;">购物车</div>
+                            <div class="cart-sub" data-current-merchant>未选择商家</div>
+                        </div>
+                        <button class="ghost-link" type="button" data-clear-cart>清空</button>
+                    </div>
+
+                    <div class="input-group cart-address">
                         <label>配送地址</label>
                         <input placeholder="请输入配送地址" data-delivery-address>
+                        <small class="muted">将把订单配送到此地址，请填写详细信息。</small>
                     </div>
-                    <div class="list" data-cart-items>
-                        <p style="color: var(--muted); margin: 0;">暂未选择菜品</p>
+
+                    <div class="cart-list" data-cart-items>
+                        <p class="muted" style="margin: 0;">暂未选择菜品</p>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                        <span style="color: var(--muted);">合计</span>
+
+                    <div class="cart-total-row">
+                        <span class="muted">合计</span>
                         <strong data-cart-total>￥0.00</strong>
                     </div>
+
                     <div class="notice" data-menu-notice style="display: none;"></div>
-                    <button class="btn" style="margin-top: 10px;" data-order-submit>确认下单</button>
-                    <button class="btn secondary" data-logout>退出登录</button>
+                    <button class="btn full" type="button" data-order-submit>确认下单</button>
+                    <button class="btn secondary full" type="button" data-logout>退出登录</button>
                 </div>
             </div>
         </div>

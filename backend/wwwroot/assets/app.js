@@ -180,6 +180,8 @@ async function renderMerchants() {
         `;
         container.appendChild(item);
     });
+
+    return merchants;
 }
 
 async function renderProducts(merchantId) {
@@ -188,17 +190,36 @@ async function renderProducts(merchantId) {
 
     container.innerHTML = "";
     const products = await apiFetch(`/api/products?merchantId=${merchantId}`);
-    products.forEach((product) => {
+    const filtered = products.filter((product) => product.productName !== "招牌红烧肉");
+    filtered.forEach((product) => {
         const item = document.createElement("div");
         item.className = "list-item fade-up";
+        
+        let imgSrc = product.imageUrl;
+        if (imgSrc && imgSrc.startsWith('/')) {
+            imgSrc = `${API_BASE.replace('/api', '')}${imgSrc}`;
+        }
+        if (!imgSrc) {
+            imgSrc = 'https://via.placeholder.com/80?text=No+Img';
+        }
+
         item.innerHTML = `
-            <div class="badge">￥${Number(product.price).toFixed(2)}</div>
-            <div>
-                <h4>${product.productName}</h4>
-                <p>${product.description || "暂无描述"}</p>
+            <div style="width: 80px; height: 80px; border-radius: 8px; overflow: hidden; flex-shrink: 0; margin-right: 12px;">
+                <img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover;" alt="${product.productName}">
             </div>
-            <button class="btn" data-add-product="${product.productId}">加入购物车</button>
+            <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h4 style="margin: 0;">${product.productName}</h4>
+                    <div class="badge">￥${Number(product.price).toFixed(2)}</div>
+                </div>
+                <p style="margin: 4px 0 8px; font-size: 12px; color: var(--muted);">${product.description || "暂无描述"}</p>
+                <button class="btn sm" data-add-product="${product.productId}">加入购物车</button>
+            </div>
         `;
+        // 修改样式以支持横向布局
+        item.style.display = "flex";
+        item.style.alignItems = "center";
+        
         container.appendChild(item);
     });
 }
@@ -213,11 +234,14 @@ function bindMenuPage() {
     const totalEl = document.querySelector("[data-cart-total]");
     const submitBtn = document.querySelector("[data-order-submit]");
     const addressInput = document.querySelector("[data-delivery-address]");
+    const merchantLabel = document.querySelector("[data-current-merchant]");
+    const clearCartBtn = document.querySelector("[data-clear-cart]");
     const logoutBtn = document.querySelector("[data-logout]");
 
     let cart = [];
     let currentMerchantId = null;
     let productCache = new Map();
+    let merchantMap = new Map();
 
     if (logoutBtn) {
         logoutBtn.addEventListener("click", () => {
@@ -227,13 +251,17 @@ function bindMenuPage() {
     }
 
     renderMerchants()
-        .then(() => {
+        .then((merchants) => {
+            merchantMap = new Map(merchants.map((m) => [m.merchantId, m.shopName]));
             merchantList.addEventListener("click", async (event) => {
                 const target = event.target;
                 if (!(target instanceof HTMLElement)) return;
                 const merchantId = target.dataset.merchantId;
                 if (!merchantId) return;
                 currentMerchantId = Number(merchantId);
+                if (merchantLabel) {
+                    merchantLabel.textContent = merchantMap.get(currentMerchantId) || "已选商家";
+                }
                 cart = [];
                 renderCart();
                 try {
@@ -244,6 +272,14 @@ function bindMenuPage() {
             });
         })
         .catch((error) => setNotice(notice, error.message));
+
+    if (clearCartBtn) {
+        clearCartBtn.addEventListener("click", () => {
+            cart = [];
+            renderCart();
+            setNotice(notice, "购物车已清空", true);
+        });
+    }
 
     document.body.addEventListener("click", async (event) => {
         const target = event.target;
@@ -282,7 +318,7 @@ function bindMenuPage() {
     function renderCart() {
         if (!cartContainer || !totalEl) return;
         if (cart.length === 0) {
-            cartContainer.innerHTML = `<p style="color: var(--muted); margin: 0;">暂未选择菜品</p>`;
+            cartContainer.innerHTML = `<p class="muted" style="margin: 0;">暂未选择菜品</p>`;
             totalEl.textContent = "￥0.00";
             return;
         }
@@ -290,9 +326,13 @@ function bindMenuPage() {
         cartContainer.innerHTML = cart
             .map(
                 (item) => `
-                <div class="cart-item">
-                    <span>${item.name} x ${item.quantity}</span>
-                    <strong>￥${(item.price * item.quantity).toFixed(2)}</strong>
+                <div class="cart-line">
+                    <div>
+                        <div class="cart-line-name">${item.name}</div>
+                        <div class="cart-line-meta">￥${item.price.toFixed(2)} / 份</div>
+                    </div>
+                    <div class="cart-line-qty">x${item.quantity}</div>
+                    <div class="cart-line-price">￥${(item.price * item.quantity).toFixed(2)}</div>
                 </div>
             `
             )
@@ -617,17 +657,32 @@ async function renderMerchantProducts() {
     const products = await apiFetch("/api/merchant/products");
     tableBody.innerHTML = products
         .map(
-            (product) => `
-            <tr data-product-row="${product.productId}">
-                <td>${product.productId}</td>
-                <td>${product.productName}</td>
-                <td>￥${Number(product.price).toFixed(2)}</td>
-                <td>${product.isAvailable ? "上架" : "下架"}</td>
-                <td>
-                    <button class="btn secondary" data-merchant-edit="${product.productId}">编辑</button>
-                </td>
-            </tr>
-        `
+            (product) => {
+                let imgSrc = product.imageUrl;
+                if (imgSrc && imgSrc.startsWith('/')) {
+                    imgSrc = `${API_BASE.replace('/api', '')}${imgSrc}`;
+                }
+                const imgHtml = imgSrc 
+                    ? `<img src="${imgSrc}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">` 
+                    : `<span style="color: #ccc;">无图</span>`;
+
+                return `
+                <tr data-product-row="${product.productId}">
+                    <td>${product.productId}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            ${imgHtml}
+                            <span>${product.productName}</span>
+                        </div>
+                    </td>
+                    <td>￥${Number(product.price).toFixed(2)}</td>
+                    <td>${product.isAvailable ? "上架" : "下架"}</td>
+                    <td>
+                        <button class="btn secondary" data-merchant-edit="${product.productId}">编辑</button>
+                    </td>
+                </tr>
+            `;
+            }
         )
         .join("");
 
@@ -713,6 +768,7 @@ function bindMerchantDashboard() {
             form.querySelector("[data-product-name]").value = product.productName;
             form.querySelector("[data-product-price]").value = product.price;
             form.querySelector("[data-product-desc]").value = product.description || "";
+            form.querySelector("[data-product-image]").value = product.imageUrl || "";
             form.querySelector("[data-product-available]").checked = product.isAvailable;
             return;
         }
@@ -740,6 +796,7 @@ function bindMerchantDashboard() {
         const productName = form.querySelector("[data-product-name]").value.trim();
         const price = Number(form.querySelector("[data-product-price]").value);
         const description = form.querySelector("[data-product-desc]").value.trim();
+        const imageUrl = form.querySelector("[data-product-image]").value.trim();
         const isAvailable = form.querySelector("[data-product-available]").checked;
 
         if (!productName || !price || price <= 0) {
@@ -755,6 +812,7 @@ function bindMerchantDashboard() {
                         productName,
                         price,
                         description,
+                        imageUrl,
                         isAvailable
                     })
                 });
@@ -766,6 +824,7 @@ function bindMerchantDashboard() {
                         productName,
                         price,
                         description,
+                        imageUrl,
                         isAvailable
                     })
                 });

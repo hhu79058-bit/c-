@@ -241,6 +241,87 @@ input, select, textarea {
     font-size: 14px;
 }
 
+.cart-panel {
+    gap: 16px;
+}
+
+.cart-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.cart-sub {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.cart-address small {
+    color: var(--muted);
+}
+
+.cart-list {
+    padding: 12px;
+    border: 1px dashed var(--stroke);
+    border-radius: 14px;
+    background: #fffdf8;
+    display: grid;
+    gap: 10px;
+}
+
+.cart-line {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.cart-line-name {
+    font-weight: 600;
+}
+
+.cart-line-meta {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.cart-line-qty {
+    padding: 6px 10px;
+    border-radius: 12px;
+    background: var(--bg-accent);
+    border: 1px solid var(--stroke);
+    font-size: 12px;
+}
+
+.cart-line-price {
+    font-weight: 600;
+}
+
+.cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 6px;
+    border-top: 1px solid var(--stroke);
+}
+
+.ghost-link {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    text-decoration: underline;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.btn.full {
+    width: 100%;
+}
+
 .status {
     font-size: 12px;
     padding: 4px 10px;

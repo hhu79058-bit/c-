@@ -5,15 +5,30 @@ using WaiMai.Backend.Models;
 
 namespace WaiMai.Backend.Services
 {
+    /// <summary>
+    /// 订单日志服务类
+    /// 负责订单状态变更日志的记录和查询
+    /// </summary>
     public class OrderLogService
     {
+        /// <summary>
+        /// 数据库帮助类实例
+        /// </summary>
         private readonly DbHelper _dbHelper;
 
+        /// <summary>
+        /// 构造函数：注入数据库帮助类
+        /// </summary>
+        /// <param name="dbHelper">数据库帮助类</param>
         public OrderLogService(DbHelper dbHelper)
         {
             _dbHelper = dbHelper;
         }
 
+        /// <summary>
+        /// 创建订单状态变更日志
+        /// </summary>
+        /// <param name="log">订单日志对象</param>
         public async Task CreateAsync(OrderLog log)
         {
             string sql = @"INSERT INTO OrderLog (OrderID, FromStatus, ToStatus, ChangedAt, Remark)
@@ -30,6 +45,12 @@ namespace WaiMai.Backend.Services
             await _dbHelper.ExecuteNonQueryAsync(sql, parameters);
         }
 
+        /// <summary>
+        /// 根据订单ID查询该订单的所有状态变更日志
+        /// 按变更时间倒序排列（最新的在前）
+        /// </summary>
+        /// <param name="orderId">订单ID</param>
+        /// <returns>订单日志列表</returns>
         public async Task<List<OrderLog>> GetByOrderIdAsync(int orderId)
         {
             string sql = "SELECT * FROM OrderLog WHERE OrderID = @OrderID ORDER BY ChangedAt DESC";

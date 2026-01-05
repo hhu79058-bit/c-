@@ -6,18 +6,32 @@ using WaiMai.Backend.Services;
 
 namespace WaiMai.Backend.Controllers
 {
+    /// <summary>
+    /// 管理员商品管理控制器
+    /// 仅限管理员访问，可管理所有商家的商品
+    /// </summary>
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]  // 仅管理员可访问
     [Route("api/admin/products")]
     public class AdminProductsController : ControllerBase
     {
         private readonly ProductService _productService;
 
+        /// <summary>
+        /// 构造函数：注入商品服务
+        /// </summary>
+        /// <param name="productService">商品服务</param>
         public AdminProductsController(ProductService productService)
         {
             _productService = productService;
         }
 
+        /// <summary>
+        /// 根据商家ID查询商品列表
+        /// GET /api/admin/products?merchantId=1
+        /// </summary>
+        /// <param name="merchantId">商家ID（查询参数）</param>
+        /// <returns>商品列表</returns>
         [HttpGet]
         public async Task<IActionResult> GetByMerchant([FromQuery] int merchantId)
         {
@@ -30,6 +44,12 @@ namespace WaiMai.Backend.Controllers
             return Ok(products);
         }
 
+        /// <summary>
+        /// 为指定商家创建新商品
+        /// POST /api/admin/products
+        /// </summary>
+        /// <param name="request">商品创建请求（包含商家ID）</param>
+        /// <returns>成功返回200和商品ID，失败返回400</returns>
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AdminCreateProductRequest request)
         {
@@ -39,7 +59,8 @@ namespace WaiMai.Backend.Controllers
                 ProductName = request.ProductName,
                 Price = request.Price,
                 Description = request.Description,
-                IsAvailable = request.IsAvailable
+                IsAvailable = request.IsAvailable,
+                ImageUrl = request.ImageUrl
             };
 
             int productId = await _productService.CreateAsync(product);
@@ -51,6 +72,13 @@ namespace WaiMai.Backend.Controllers
             return Ok(new { productId });
         }
 
+        /// <summary>
+        /// 更新商品信息
+        /// PUT /api/admin/products/{productId}
+        /// </summary>
+        /// <param name="productId">商品ID</param>
+        /// <param name="request">商品更新请求</param>
+        /// <returns>成功返回200，失败返回404</returns>
         [HttpPut("{productId:int}")]
         public async Task<IActionResult> Update(int productId, [FromBody] AdminUpdateProductRequest request)
         {
@@ -61,7 +89,8 @@ namespace WaiMai.Backend.Controllers
                 ProductName = request.ProductName,
                 Price = request.Price,
                 Description = request.Description,
-                IsAvailable = request.IsAvailable
+                IsAvailable = request.IsAvailable,
+                ImageUrl = request.ImageUrl
             };
 
             bool success = await _productService.UpdateAsync(product);
@@ -73,6 +102,13 @@ namespace WaiMai.Backend.Controllers
             return Ok(new { message = "更新成功" });
         }
 
+        /// <summary>
+        /// 快速切换商品上架/下架状态
+        /// PATCH /api/admin/products/{productId}/availability
+        /// </summary>
+        /// <param name="productId">商品ID</param>
+        /// <param name="request">上架状态请求（包含商家ID和目标状态）</param>
+        /// <returns>成功返回200，失败返回404</returns>
         [HttpPatch("{productId:int}/availability")]
         public async Task<IActionResult> ToggleAvailability(int productId, [FromBody] AdminToggleProductRequest request)
         {
