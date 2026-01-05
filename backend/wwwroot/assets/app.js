@@ -950,11 +950,20 @@ document.addEventListener("DOMContentLoaded", () => {
     bindOrderPayments();
     bindAdminDashboard();
     bindMerchantDashboard();
+    
+    // 新增：管理员子页面绑定
+    bindAdminUsers();
+    bindAdminMerchants();
+    renderAdminMonitorOrders();
+    
+    // 新增：下拉菜单绑定
+    bindUserDropdown();
 
     const refreshBtn = document.querySelector("[data-refresh-orders]");
     if (refreshBtn) {
         refreshBtn.addEventListener("click", () => {
             renderOrders();
+            renderAdminMonitorOrders(); // 同时尝试刷新管理员监控列表
         });
     }
 
@@ -966,3 +975,205 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+function bindUserDropdown() {
+    const trigger = document.querySelector("[data-user-dropdown-trigger]");
+    const dropdown = document.getElementById("userDropdown");
+
+    if (!trigger || !dropdown) return;
+
+    trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle("show");
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!trigger.contains(e.target)) {
+            dropdown.classList.remove("show");
+        }
+    });
+}
+
+async function bindAdminUsers() {
+    const tableBody = document.querySelector("[data-admin-users-body]");
+    if (!tableBody) return;
+    if (!requireAdmin()) return;
+
+    // 获取搜索组件
+    const searchInput = document.querySelector(".card-header input");
+    const searchBtn = document.querySelector(".card-header button");
+
+    let allUsers = [];
+
+    // 渲染函数
+    const render = (users) => {
+        if (users.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--muted);">未找到匹配用户</td></tr>`;
+            return;
+        }
+        tableBody.innerHTML = users.map(u => `
+            <tr>
+                <td>#${u.userId}</td>
+                <td>
+                    <div style="font-weight: 500;">${u.userName}</div>
+                    <div style="font-size: 12px; color: var(--muted);">${u.role}</div>
+                </td>
+                <td>${u.registerTime}</td>
+                <td><span class="badge badge-success">正常</span></td>
+            </tr>
+        `).join("");
+    };
+
+    // 过滤逻辑
+    const doSearch = () => {
+        const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
+        const filtered = allUsers.filter(u => 
+            u.userName.toLowerCase().includes(keyword) || 
+            String(u.userId).includes(keyword)
+        );
+        render(filtered);
+    };
+
+    // 绑定事件
+    if (searchBtn) {
+        searchBtn.addEventListener("click", doSearch);
+    }
+    if (searchInput) {
+        searchInput.addEventListener("keyup", (e) => {
+            if (e.key === "Enter") doSearch();
+        });
+    }
+
+    try {
+        // 调用后端 API 获取真实数据
+        allUsers = await apiFetch("/api/admin/users");
+        
+        // 初始渲染
+        render(allUsers);
+    } catch (error) {
+        tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: red;">加载失败: ${error.message}</td></tr>`;
+    }
+}
+
+async function bindAdminMerchants() {
+    const tableBody = document.querySelector("[data-admin-merchants-body]");
+    if (!tableBody) return;
+    if (!requireAdmin()) return;
+
+    // 获取搜索组件
+    const searchInput = document.querySelector(".card-header input");
+    const searchBtn = document.querySelector(".card-header button");
+
+    let allMerchants = [];
+
+    const render = (merchants) => {
+        if (merchants.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--muted);">未找到匹配商家</td></tr>`;
+            return;
+        }
+        tableBody.innerHTML = merchants.map(m => `
+            <tr>
+                <td>#${m.merchantId}</td>
+                <td>
+                    <div style="font-weight: 500;">${m.shopName}</div>
+                </td>
+                <td>${m.shopAddress || "未填写"}</td>
+                <td><span class="badge badge-success">营业中</span></td>
+            </tr>
+        `).join("");
+    };
+
+    const doSearch = () => {
+        const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
+        const filtered = allMerchants.filter(m => 
+            m.shopName.toLowerCase().includes(keyword) || 
+            (m.shopAddress && m.shopAddress.toLowerCase().includes(keyword))
+        );
+        render(filtered);
+    };
+
+    if (searchBtn) {
+        searchBtn.addEventListener("click", doSearch);
+    }
+    if (searchInput) {
+        searchInput.addEventListener("keyup", (e) => {
+            if (e.key === "Enter") doSearch();
+        });
+    }
+
+    try {
+        allMerchants = await apiFetch("/api/merchants");
+        render(allMerchants);
+    } catch (error) {
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: red;">加载失败: ${error.message}</td></tr>`;
+    }
+}
+
+async function renderAdminMonitorOrders() {
+    const tableBody = document.querySelector("[data-orders-body]");
+    if (!tableBody || !document.location.pathname.includes("admin-orders.html")) return; 
+    
+    // 绑定点击事件 (使用标志位避免重复绑定，或者简单地在 document 上绑定一次即可，但为了封装性，我们在这里处理)
+    // 注意：由于 renderAdminMonitorOrders 可能被多次调用（刷新），直接在这里绑定会导致重复绑定。
+    // 更好的方式是像 bindMerchantDashboard 那样在初始化时绑定。
+    // 但为了不大幅改动结构，我们使用 document 代理，并放在函数外，或者用一个全局 flag。
+    // 既然我们不能轻易改动函数外的结构，我们就在这里检查是否已经绑定过。
+    if (!tableBody.dataset.eventsBound) {
+        tableBody.addEventListener("click", async (e) => {
+            const btn = e.target.closest("[data-admin-cancel-order]");
+            if (!btn) return;
+            
+            if (!confirm("确定要强制取消该订单吗？此操作不可恢复。")) return;
+
+            const orderId = btn.dataset.adminCancelOrder;
+            try {
+                // 使用管理员权限接口更新状态为 4 (已取消)
+                await apiFetch(`/api/admin/orders/${orderId}/status`, {
+                    method: "PUT",
+                    body: JSON.stringify({ orderStatus: 4 })
+                });
+                alert("订单已强制取消");
+                renderAdminMonitorOrders(); // 刷新列表
+            } catch (error) {
+                alert("操作失败: " + error.message);
+            }
+        });
+        tableBody.dataset.eventsBound = "true";
+    }
+
+    try {
+        const orders = await apiFetch("/api/admin/orders");
+        // 按时间倒序排列
+        orders.sort((a, b) => new Date(b.orderTime) - new Date(a.orderTime));
+
+        tableBody.innerHTML = orders.map(order => {
+             const statusMap = {
+                0: { label: "待接单", cls: "pending" },
+                1: { label: "已接单", cls: "delivering" },
+                2: { label: "配送中", cls: "delivering" },
+                3: { label: "已完成", cls: "completed" },
+                4: { label: "已取消", cls: "pending" }
+            };
+            const status = statusMap[order.orderStatus] || { label: "未知", cls: "pending" };
+            
+            // 只有未完成且未取消的订单可以强制取消
+            const canCancel = order.orderStatus < 3;
+
+            return `
+                <tr>
+                    <td>${order.orderNumber}</td>
+                    <td>${order.userId}</td>
+                    <td>${order.merchantId}</td>
+                    <td>￥${Number(order.orderAmount).toFixed(2)}</td>
+                    <td><span class="status ${status.cls}">${status.label}</span></td>
+                    <td>
+                        ${canCancel ? `<button class="btn btn-ghost btn-sm text-danger" data-admin-cancel-order="${order.orderId}">强制取消</button>` : '-'}
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    } catch (error) {
+        console.error(error);
+        tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: red;">加载失败: ${error.message}</td></tr>`;
+    }
+}

@@ -3,116 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>外卖点餐系统 · 管理控制台</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <title>外卖点餐系统 · 管理后台</title>
+    <!-- 引入新的设计系统样式 -->
+    <link rel="stylesheet" href="assets/reference.css">
+    <!-- 引入字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="page">
-        <div class="container card" data-admin-dashboard>
-            <div class="nav">
-                <div class="brand">外卖点餐系统</div>
-                <div class="nav-links">
-                    <a href="index.html" data-nav="login">登录</a>
-                    <a href="menu.html" data-nav="menu">点餐</a>
-                    <a href="orders.html" data-nav="orders">订单</a>
-                    <a href="merchant.html" data-nav="merchant">商家</a>
-                    <a href="admin.html" data-nav="admin">管理</a>
-                </div>
+    <div class="app-layout" data-admin-dashboard>
+        <!-- 1. 侧边导航栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="brand">外卖点餐系统</a>
             </div>
+            <nav class="sidebar-nav">
+                <a href="admin.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    运营概览
+                </a>
+                <a href="admin-users.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    用户管理
+                </a>
+                <a href="admin-merchants.html" class="nav-item">
+                    <span class="nav-icon">🏪</span>
+                    商家管理
+                </a>
+                <a href="admin-orders.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    订单监控
+                </a>
+            </nav>
+        </aside>
 
-            <section style="padding: 24px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <span class="pill">运营总览</span>
-                        <h2 class="section-title">今日概况</h2>
-                    </div>
-                    <button class="btn secondary" data-logout>退出登录</button>
+        <!-- 2. 主内容区域 -->
+        <main class="main-content">
+            <!-- 顶部栏 -->
+            <header class="top-header">
+                <div class="breadcrumbs">
+                    管理后台 / 概览
                 </div>
-                <div class="grid-3" style="margin-top: 18px;">
-                    <div class="stat-card">
-                        <div style="color: var(--muted);">订单总量</div>
-                        <strong data-total-orders>0</strong>
-                    </div>
-                    <div class="stat-card">
-                        <div style="color: var(--muted);">今日订单</div>
-                        <strong data-today-orders>0</strong>
-                    </div>
-                    <div class="stat-card">
-                        <div style="color: var(--muted);">累计营收</div>
-                        <strong data-total-revenue>￥0.00</strong>
+                <div class="user-profile" style="position: relative; cursor: pointer;" data-user-dropdown-trigger>
+                    <div class="avatar">管</div>
+                    <span style="font-weight: 500; font-size: 14px;">管理员</span>
+                    <!-- Dropdown -->
+                    <div class="dropdown-menu" id="userDropdown">
+                        <button class="dropdown-item text-danger" data-logout>退出登录</button>
                     </div>
                 </div>
-            </section>
+            </header>
 
-            <section class="grid-2" style="padding: 0 24px 24px;">
-                <div class="card" style="padding: 18px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 class="section-title">菜品管理</h3>
-                        <select data-merchant-select></select>
-                    </div>
-                    <form style="margin-top: 14px; display: grid; gap: 12px;" data-product-form>
-                        <div class="input-group">
-                            <label>菜品名称</label>
-                            <input data-product-name placeholder="请输入菜品名称">
-                        </div>
-                        <div class="grid-2">
-                            <div class="input-group">
-                                <label>价格</label>
-                                <input data-product-price type="number" step="0.01" placeholder="价格">
-                            </div>
-                            <div class="input-group">
-                                <label>上架状态</label>
-                                <input data-product-available type="checkbox" checked>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>描述</label>
-                            <textarea data-product-desc rows="3" placeholder="菜品描述"></textarea>
-                        </div>
-                        <button class="btn" type="submit">保存菜品</button>
-                    </form>
-
-                    <table class="table" style="margin-top: 18px;">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>名称</th>
-                                <th>价格</th>
-                                <th>状态</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody data-products-body></tbody>
-                    </table>
+            <!-- 内容容器 -->
+            <div class="content-wrapper" style="max-width: 1600px;">
+                
+                <div style="margin-bottom: 40px;">
+                    <h1 style="font-size: 32px; font-weight: 700; margin: 0 0 10px;">运营概览</h1>
+                    <p style="margin: 0; color: var(--color-text-muted); font-size: 16px;">查看平台的实时运营数据。</p>
                 </div>
 
-                <div class="card" style="padding: 18px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 class="section-title">订单管理</h3>
-                        <button class="btn secondary" data-refresh-orders>刷新</button>
+                <!-- 统计卡片 -->
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); gap: 32px;">
+                    <div class="stat-card" style="padding: 32px;">
+                        <div class="stat-label" style="font-size: 16px;">今日订单</div>
+                        <div class="stat-value" style="font-size: 48px; margin-top: 10px;" data-today-orders>0</div>
                     </div>
-                    <div class="notice" data-admin-notice style="display: none; margin: 12px 0;"></div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>订单号</th>
-                                <th>用户</th>
-                                <th>商家</th>
-                                <th>金额</th>
-                                <th>状态</th>
-                                <th>更新</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody data-orders-body></tbody>
-                    </table>
+                    <div class="stat-card" style="padding: 32px;">
+                        <div class="stat-label" style="font-size: 16px;">订单总量</div>
+                        <div class="stat-value" style="font-size: 48px; margin-top: 10px;" data-total-orders>0</div>
+                    </div>
+                    <div class="stat-card" style="padding: 32px;">
+                        <div class="stat-label" style="font-size: 16px;">累计营收</div>
+                        <div class="stat-value" style="font-size: 48px; margin-top: 10px; color: var(--color-primary);" data-total-revenue>￥0.00</div>
+                    </div>
                 </div>
-            </section>
-        </div>
+
+                <!-- 欢迎面板 -->
+                <div class="card" style="padding: 40px; text-align: center; border-style: dashed; background: transparent;">
+                    <h3 style="margin-top: 0; color: var(--color-text-muted);">欢迎回到管理后台</h3>
+                    <p style="color: var(--color-text-muted);">请从左侧导航栏选择具体管理功能。</p>
+                </div>
+
+            </div>
+        </main>
     </div>
+    
     <script src="assets/app.js"></script>
 </body>
 </html>

@@ -9,43 +9,47 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="page">
-        <div class="container card fade-up">
-            <div class="nav">
-                <div class="brand">外卖点餐系统</div>
+<body style="overflow: hidden;">
+    <!-- 使用 flex 居中布局，更像传统的管理系统入口 -->
+    <div class="page" style="padding: 0; display: flex; align-items: center; justify-content: center; height: 100vh;">
+        
+        <div class="container" style="width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 30px;">
+            
+            <!-- 标题区域 -->
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h1 style="font-size: 48px; margin: 0 0 16px; color: var(--ink); font-weight: 700;">外卖点餐系统</h1>
+                <p style="font-size: 18px; color: var(--muted); margin: 0;">
+                    请使用您的账号登录系统
+                </p>
             </div>
-            <div class="hero">
-                <div class="hero-copy">
-                    
-                    <h1>选择你的身份，开启今日的外卖旅程。</h1>
-                    <p>
-                        用户、商家、管理员共用一个入口。请选择身份，再输入账号密码进入系统。
-                    </p>
+
+            <!-- 登录卡片 -->
+            <form class="card fade-up" data-login-form style="padding: 50px; border-radius: 28px; box-shadow: 0 25px 50px rgba(0,0,0,0.1);">
+                <div class="input-group">
+                    <label for="username" style="font-size: 15px; margin-bottom: 10px;">账号</label>
+                    <input id="username" placeholder="请输入用户名" style="padding: 18px; font-size: 16px; border-radius: 16px;">
                 </div>
-                <form class="login-box card" data-login-form>
-                    <h3 class="section-title">账号登录</h3>
-                    <div class="input-group">
-                        <label for="username">用户名</label>
-                        <input id="username" placeholder="请输入用户名">
-                    </div>
-                    <div class="input-group">
-                        <label for="password">密码</label>
-                        <input id="password" type="password" placeholder="请输入密码">
-                    </div>
-                    <div class="input-group">
-                        <label for="role">身份</label>
-                        <select id="role">
-                            <option>用户</option>
-                            <option>商家</option>
-                            <option>管理员</option>
-                        </select>
-                    </div>
-                    <div class="notice" data-login-notice style="display: none;"></div>
-                    <button class="btn" type="submit">进入系统</button>
-                </form>
+                <div class="input-group" style="margin-top: 20px;">
+                    <label for="password" style="font-size: 15px; margin-bottom: 10px;">密码</label>
+                    <input id="password" type="password" placeholder="请输入密码" style="padding: 18px; font-size: 16px; border-radius: 16px;">
+                </div>
+                <div class="input-group" style="margin-top: 20px;">
+                    <label for="role" style="font-size: 15px; margin-bottom: 10px;">身份</label>
+                    <select id="role" style="padding: 18px; font-size: 16px; border-radius: 16px;">
+                        <option>用户</option>
+                        <option>商家</option>
+                        <option>管理员</option>
+                    </select>
+                </div>
+                <div class="notice" data-login-notice style="display: none; margin-top: 15px;"></div>
+                <button class="btn" type="submit" style="width: 100%; margin-top: 36px; padding: 20px; font-size: 18px; border-radius: 18px;">立即登录</button>
+            </form>
+            
+            <div style="text-align: center; color: var(--muted); font-size: 13px; opacity: 0.6;">
+               
             </div>
         </div>
+
     </div>
     <script src="assets/app.js"></script>
 </body>

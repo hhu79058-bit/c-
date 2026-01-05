@@ -106,6 +106,23 @@ namespace WaiMai.Backend.Services
         }
 
         /// <summary>
+        /// 获取所有用户（管理员使用）
+        /// </summary>
+        /// <returns>用户列表</returns>
+        public async Task<List<User>> GetAllUsersAsync()
+        {
+            string sql = "SELECT * FROM [User] ORDER BY UserID DESC";
+            DataTable dt = await _dbHelper.ExecuteQueryAsync(sql);
+            
+            var users = new List<User>();
+            foreach (DataRow row in dt.Rows)
+            {
+                users.Add(MapUser(row));
+            }
+            return users;
+        }
+
+        /// <summary>
         /// 将数据库行映射为User对象
         /// </summary>
         /// <param name="row">数据库行</param>

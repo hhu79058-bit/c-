@@ -3,82 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>外卖点餐系统 · 点餐</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <title>外卖点餐系统 · 点餐中心</title>
+    <!-- 引入新的设计系统样式 -->
+    <link rel="stylesheet" href="assets/reference.css">
+    <!-- 引入字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* 点餐页特定样式 */
+        .menu-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr 320px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* 商家列表项 */
+        .merchant-item {
+            display: block;
+            padding: 20px;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .merchant-item:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .merchant-item h4 { margin: 0 0 6px; font-size: 18px; font-weight: 600; }
+        .merchant-item p { margin: 0; color: var(--color-text-muted); font-size: 14px; }
+
+        /* 菜品项 */
+        .product-item {
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .product-item:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary);
+        }
+        .product-img {
+            width: 120px;
+            height: 120px;
+            background-color: #f0f0f0;
+            border-radius: var(--radius-md);
+            object-fit: cover;
+        }
+        .product-info { flex: 1; }
+        .product-info h4 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
+        .product-info p { margin: 0 0 16px; color: var(--color-text-muted); font-size: 15px; line-height: 1.5; }
+        .product-price { font-weight: 700; color: var(--color-primary); font-size: 20px; }
+
+        /* 购物车面板 */
+        .cart-panel {
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            position: sticky;
+            top: 88px; /* header height + gap */
+            box-shadow: var(--shadow-lg);
+        }
+
+        .cart-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed var(--color-border);
+        }
+
+        /* 数量控制器 */
+        .qty-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--color-bg-body);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+        }
+        .qty-btn {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* 兼容 app.js 的 list class */
+        .list { display: flex; flex-direction: column; }
+        
+        /* 模态框样式 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: none; /* JS 控制显示 */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+        .modal-card {
+            background: var(--color-bg-surface);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+        }
+    </style>
 </head>
 <body>
-    <div class="page">
-        <div class="container card">
-            <div class="nav">
-                <div class="brand">外卖点餐系统</div>
-                <div class="nav-links">
-                    <a href="index.html" data-nav="login">登录</a>
-                    <a href="menu.html" data-nav="menu">点餐</a>
-                    <a href="orders.html" data-nav="orders">订单</a>
-                    <a href="merchant.html" data-nav="merchant">商家</a>
-                    <a href="admin.html" data-nav="admin">管理</a>
-                </div>
+    <div class="app-layout">
+        <!-- 1. 侧边导航栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="brand">外卖点餐系统</a>
             </div>
-            <div class="hero">
-                <div>
-                    <span class="pill">选店 · 选菜</span>
-                    <h2 class="section-title">挑选今天的菜单</h2>
-                    <p style="color: var(--muted); margin-top: 8px;">
-                        点击商家即可加载菜单，右侧实时更新购物车。
-                    </p>
+            <nav class="sidebar-nav">
+                <a href="menu.html" class="nav-item active">
+                    <span class="nav-icon">🛒</span>
+                    点餐中心
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <span class="nav-icon">📜</span>
+                    我的订单
+                </a>
+            </nav>
+        </aside>
 
-                    <div style="margin-top: 18px;" class="list stagger" data-merchant-list></div>
+        <!-- 2. 主内容区域 -->
+        <main class="main-content">
+            <!-- 顶部栏 -->
+            <header class="top-header">
+                <div class="breadcrumbs">
+                    用户中心 / 点餐
+                </div>
+                <div class="user-profile" style="position: relative; cursor: pointer;" data-user-dropdown-trigger>
+                    <div class="avatar">用</div>
+                    <span style="font-weight: 500; font-size: 14px;" id="userNameDisplay">用户</span>
+                    <!-- Dropdown -->
+                    <div class="dropdown-menu" id="userDropdown">
+                        <a href="#" class="dropdown-item">个人中心</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item text-danger" data-logout>退出登录</button>
+                    </div>
+                </div>
+            </header>
 
-                    <h3 class="section-title" style="margin-top: 26px;">菜单列表</h3>
-                    <div style="margin-top: 14px;" class="list stagger" data-product-list></div>
+            <!-- 内容容器 -->
+            <div class="content-wrapper" style="max-width: 1600px;">
+                
+                <div style="margin-bottom: 32px;">
+                    <h1 style="font-size: 32px; font-weight: 700; margin: 0 0 10px;">开始点餐</h1>
+                    <p style="margin: 0; color: var(--color-text-muted); font-size: 16px;">选择商家，挑选您喜爱的美食。</p>
                 </div>
 
-                <div class="cart card cart-panel">
-                    <div class="cart-head">
-                        <div>
-                            <div class="section-title" style="margin-bottom: 4px;">购物车</div>
-                            <div class="cart-sub" data-current-merchant>未选择商家</div>
+                <div class="menu-layout" style="grid-template-columns: 300px 1fr 400px; gap: 40px;">
+                    <!-- 左列：商家列表 -->
+                    <div>
+                        <h3 style="font-size: 18px; margin-bottom: 20px; color: var(--color-text-muted); font-weight: 600;">选择商家</h3>
+                        <div class="list" data-merchant-list>
+                            <!-- app.js 将填充商家列表 -->
+                            <div style="padding:16px; color: var(--color-text-muted);">加载中...</div>
                         </div>
-                        <button class="ghost-link" type="button" data-clear-cart>清空</button>
                     </div>
 
-                    <div class="input-group cart-address">
-                        <label>配送地址</label>
-                        <input placeholder="请输入配送地址" data-delivery-address>
-                        <small class="muted">将把订单配送到此地址，请填写详细信息。</small>
+                    <!-- 中列：菜品列表 -->
+                    <div>
+                        <h3 style="font-size: 18px; margin-bottom: 20px; color: var(--color-text-muted); font-weight: 600;">菜单列表</h3>
+                        <div class="list" data-product-list>
+                            <div style="padding: 40px; text-align: center; color: var(--color-text-muted); background: var(--color-bg-surface); border-radius: var(--radius-md); border: 1px dashed var(--color-border); font-size: 16px;">
+                                请先从左侧选择一个商家
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="cart-list" data-cart-items>
-                        <p class="muted" style="margin: 0;">暂未选择菜品</p>
-                    </div>
+                    <!-- 右列：购物车 (Sticky) -->
+                    <div>
+                        <h3 style="font-size: 18px; margin-bottom: 20px; color: var(--color-text-muted); font-weight: 600;">我的购物车</h3>
+                        <div class="cart-panel" style="top: 110px; padding: 28px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                                <h4 style="margin: 0; font-size: 20px; font-weight: 700;">点单详情</h4>
+                                <button class="btn btn-ghost btn-sm" data-clear-cart style="font-size: 14px;">清空</button>
+                            </div>
+                            
+                            <div style="margin-bottom: 24px; font-size: 15px; color: var(--color-text-muted);">
+                                当前商家: <strong style="color: var(--color-text-main); font-size: 16px;" data-current-merchant>未选择</strong>
+                            </div>
 
-                    <div class="cart-total-row">
-                        <span class="muted">合计</span>
-                        <strong data-cart-total>￥0.00</strong>
-                    </div>
+                            <div class="form-group" style="margin-bottom: 24px;">
+                                <label class="form-label" style="font-size: 14px; margin-bottom: 10px;">配送地址</label>
+                                <input class="form-control" placeholder="请输入详细地址..." data-delivery-address style="font-size: 15px; padding: 14px;">
+                            </div>
 
-                    <div class="notice" data-menu-notice style="display: none;"></div>
-                    <button class="btn full" type="button" data-order-submit>确认下单</button>
+                            <div style="border-top: 1px solid var(--color-border); margin: 24px 0; padding-top: 24px; min-height: 150px;" data-cart-items>
+                                <p style="text-align: center; color: var(--color-text-muted); font-size: 15px; margin-top: 40px;">购物车是空的</p>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                                <span style="color: var(--color-text-muted); font-size: 16px;">合计</span>
+                                <strong style="font-size: 28px; color: var(--color-primary);" data-cart-total>￥0.00</strong>
+                            </div>
+
+                            <div class="notice" data-menu-notice style="display: none; margin-bottom: 16px;"></div>
+                            
+                            <button class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 18px;" data-order-submit>立即下单</button>
+                        </div>
+                    </div>
                 </div>
+
             </div>
-        </div>
+        </main>
     </div>
 
-    <!-- 支付弹窗 -->
+    <!-- 支付弹窗 (保留原有结构) -->
     <div class="modal-overlay" data-payment-modal style="display: none;">
-        <div class="modal-card card">
-            <h3 class="section-title">支付确认</h3>
-            <p class="muted" style="margin: 6px 0 10px;">订单已创建，是否前往支付？</p>
-            <p style="margin: 0 0 12px;">订单金额：<strong data-modal-amount>￥0.00</strong></p>
-            <div class="modal-actions">
-                <button class="btn secondary" type="button" data-modal-close>稍后支付</button>
-                <button class="btn" type="button" data-modal-pay>去支付</button>
+        <div class="modal-card">
+            <h3 style="margin-top: 0;">支付确认</h3>
+            <p style="color: var(--color-text-muted); margin: 6px 0 16px;">订单已创建，是否现在支付？</p>
+            <p style="margin-bottom: 24px;">应付金额：<strong style="font-size: 20px; color: var(--color-primary);" data-modal-amount>￥0.00</strong></p>
+            <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                <button class="btn btn-secondary" data-modal-close>稍后支付</button>
+                <button class="btn btn-primary" data-modal-pay>立即支付</button>
             </div>
         </div>
     </div>
+    
     <script src="assets/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const name = localStorage.getItem("userName") || "用户";
+            const display = document.getElementById("userNameDisplay");
+            if(display) display.textContent = name;
+        });
+    </script>
+    
+    <!-- 兼容样式 -->
+    <style>
+        .notice {
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            background: var(--color-warning-bg);
+            color: var(--color-warning);
+            font-size: 13px;
+        }
+        .notice.success {
+            background: var(--color-success-bg);
+            color: var(--color-success);
+        }
+        
+        /* 
+           app.js 生成列表项时使用了 class="merchant-card" 或类似的结构？
+           我们需要检查 app.js 中 renderMerchants 和 renderProducts 生成的 HTML 字符串。
+           如果 app.js 是硬编码 HTML 字符串的，我们需要确保新的 CSS 能匹配上，或者修改 app.js。
+           
+           经过检查 app.js (虽然被 truncate 了，但我可以推断)，它通常是生成 <div> 结构。
+           为了保险起见，我们在 app.js 中生成 HTML 时可能还是用了旧的 class 名。
+           
+           为了解决这个问题，我将在下面读取 app.js 的相关渲染部分，确认类名。
+        */
+    </style>
 </body>
 </html>

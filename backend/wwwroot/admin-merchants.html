@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外卖点餐系统 · 商家管理</title>
+    <link rel="stylesheet" href="assets/reference.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout" data-admin-dashboard>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="brand">外卖点餐系统</a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    运营概览
+                </a>
+                <a href="admin-users.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    用户管理
+                </a>
+                <a href="admin-merchants.html" class="nav-item active">
+                    <span class="nav-icon">🏪</span>
+                    商家管理
+                </a>
+                <a href="admin-orders.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    订单监控
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="breadcrumbs">
+                    管理后台 / 商家管理
+                </div>
+                <div class="user-profile" style="position: relative; cursor: pointer;" data-user-dropdown-trigger>
+                    <div class="avatar">管</div>
+                    <span style="font-weight: 500; font-size: 14px;">管理员</span>
+                    <div class="dropdown-menu" id="userDropdown">
+                        <button class="dropdown-item text-danger" data-logout>退出登录</button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper" style="max-width: 1600px;">
+                <div style="margin-bottom: 40px;">
+                    <h1 style="font-size: 32px; font-weight: 700; margin: 0 0 10px;">商家管理</h1>
+                    <p style="margin: 0; color: var(--color-text-muted); font-size: 16px;">审核入驻商家，监管经营状态。</p>
+                </div>
+
+                <div class="card" style="padding: 32px; border-radius: var(--radius-lg);">
+                    <div class="card-header">
+                        <h3 class="card-title" style="font-size: 24px; font-weight: 700;">入驻商家列表</h3>
+                        <div style="display: flex; gap: 12px;">
+                            <input type="text" class="form-control" placeholder="搜索商家名称..." style="width: 240px;">
+                            <button class="btn btn-primary">搜索</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr style="font-size: 16px;">
+                                    <th style="padding: 20px 16px;">商家ID</th>
+                                    <th style="padding: 20px 16px;">店铺名称</th>
+                                    <th style="padding: 20px 16px;">地址</th>
+                                    <th style="padding: 20px 16px;">经营状态</th>
+                                </tr>
+                            </thead>
+                            <tbody data-admin-merchants-body style="font-size: 15px;">
+                                <!-- 将由 JS 填充 -->
+                                <tr><td colspan="4" style="text-align:center; padding: 60px;">加载中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="assets/app.js"></script>
+    <style>
+        .table td { padding: 20px 16px !important; }
+        .badge { padding: 6px 12px; border-radius: 99px; font-size: 13px; font-weight: 600; }
+        .badge.success { background: var(--color-success-bg); color: var(--color-success); }
+        .badge.warning { background: var(--color-warning-bg); color: var(--color-warning); }
+    </style>
+</body>
+</html>

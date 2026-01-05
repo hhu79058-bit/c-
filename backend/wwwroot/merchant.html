@@ -3,102 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>外卖点餐系统 · 商家工作台</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <title>外卖点餐系统 · 商家菜品</title>
+    <!-- 引入新的设计系统样式 -->
+    <link rel="stylesheet" href="assets/reference.css">
+    <!-- 引入字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="page">
-        <div class="container card" data-merchant-dashboard>
-            <div class="nav">
-                <div class="brand">外卖点餐系统</div>
-                <div class="nav-links">
-                    <a href="index.html" data-nav="login">登录</a>
-                    <a href="menu.html" data-nav="menu">点餐</a>
-                    <a href="orders.html" data-nav="orders">订单</a>
-                    <a href="merchant.html" data-nav="merchant">商家</a>
-                    <a href="admin.html" data-nav="admin">管理</a>
-                </div>
+    <div class="app-layout" data-merchant-dashboard>
+        <!-- 1. 侧边导航栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="brand">外卖点餐系统</a>
             </div>
+            <nav class="sidebar-nav">
+                <a href="merchant.html" class="nav-item active">
+                    <span class="nav-icon">🍔</span>
+                    我的菜品
+                </a>
+                <a href="merchant-orders.html" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    订单处理
+                </a>
+            </nav>
+        </aside>
 
-            <section style="padding: 24px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <span class="pill">商家端</span>
-                        <h2 class="section-title">门店订单与菜品管理</h2>
+        <!-- 2. 主内容区域 -->
+        <main class="main-content">
+            <!-- 顶部栏 -->
+            <header class="top-header">
+                <div class="breadcrumbs">
+                    商家中心 / 菜品管理
+                </div>
+                <div class="user-profile" style="position: relative; cursor: pointer;" data-user-dropdown-trigger>
+                    <div class="avatar">商</div>
+                    <span style="font-weight: 500; font-size: 14px;">商家</span>
+                    <!-- Dropdown -->
+                    <div class="dropdown-menu" id="userDropdown">
+                        <a href="#" class="dropdown-item">店铺设置</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item text-danger" data-logout>退出登录</button>
                     </div>
-                    <button class="btn secondary" data-logout>退出登录</button>
                 </div>
-            </section>
+            </header>
 
-            <section class="grid-2" style="padding: 0 24px 24px;">
-                <div class="card" style="padding: 18px;">
-                    <h3 class="section-title">我的菜品</h3>
-                    <form style="margin-top: 14px; display: grid; gap: 12px;" data-merchant-product-form>
-                        <div class="input-group">
-                            <label>菜品名称</label>
-                            <input data-product-name placeholder="请输入菜品名称">
-                        </div>
-                        <div class="grid-2">
-                            <div class="input-group">
-                                <label>价格</label>
-                                <input data-product-price type="number" step="0.01" placeholder="价格">
-                            </div>
-                            <div class="input-group">
-                                <label>上架状态</label>
-                                <input data-product-available type="checkbox" checked>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>描述</label>
-                            <textarea data-product-desc rows="3" placeholder="菜品描述"></textarea>
-                        </div>
-                        <div class="input-group">
-                            <label>图片URL</label>
-                            <input data-product-image placeholder="输入图片URL或上传">
-                        </div>
-                        <button class="btn" type="submit">保存菜品</button>
-                    </form>
-
-                    <table class="table" style="margin-top: 18px;">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>名称</th>
-                                <th>价格</th>
-                                <th>状态</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody data-merchant-products-body></tbody>
-                    </table>
+            <!-- 内容容器 -->
+            <div class="content-wrapper" style="max-width: 1600px;">
+                
+                <div style="margin-bottom: 40px;">
+                    <h1 style="font-size: 32px; font-weight: 700; margin: 0 0 10px;">菜品管理</h1>
+                    <p style="margin: 0; color: var(--color-text-muted); font-size: 16px;">添加或编辑您的菜单项目。</p>
                 </div>
 
-                <div class="card" style="padding: 18px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 class="section-title">订单处理</h3>
-                        <button class="btn secondary" data-merchant-refresh-orders>刷新</button>
+                <!-- 菜品管理卡片 -->
+                <div class="card" id="products" style="padding: 32px; border-radius: var(--radius-lg);">
+                    <div class="card-header">
+                        <h3 class="card-title" style="font-size: 24px; font-weight: 700;">我的菜品列表</h3>
                     </div>
-                    <div class="notice" data-merchant-notice style="display: none; margin: 12px 0;"></div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>订单号</th>
-                                <th>用户</th>
-                                <th>金额</th>
-                                <th>状态</th>
-                                <th>更新</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody data-merchant-orders-body></tbody>
-                    </table>
+
+                    <div style="display: grid; grid-template-columns: 400px 1fr; gap: 48px;">
+                        <!-- 左侧：表单 -->
+                        <div>
+                            <h4 style="margin: 0 0 24px; font-size: 18px; font-weight: 600;">添加/编辑菜品</h4>
+                            <form data-merchant-product-form>
+                                <div class="form-group" style="margin-bottom: 24px;">
+                                    <label class="form-label" style="font-size: 15px; margin-bottom: 10px;">菜品名称</label>
+                                    <input class="form-control" data-product-name placeholder="请输入菜品名称" required style="padding: 14px; font-size: 15px;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 24px;">
+                                    <label class="form-label" style="font-size: 15px; margin-bottom: 10px;">价格</label>
+                                    <input class="form-control" data-product-price type="number" step="0.01" placeholder="0.00" required style="padding: 14px; font-size: 15px;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 24px;">
+                                    <label class="form-label" style="font-size: 15px; margin-bottom: 10px;">上架状态</label>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="checkbox" data-product-available id="cbAvailable" checked style="transform: scale(1.2);">
+                                        <label for="cbAvailable" style="font-size: 15px;">立即上架</label>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 24px;">
+                                    <label class="form-label" style="font-size: 15px; margin-bottom: 10px;">描述</label>
+                                    <textarea class="form-control" data-product-desc rows="4" placeholder="菜品描述..." style="padding: 14px; font-size: 15px;"></textarea>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 24px;">
+                                    <label class="form-label" style="font-size: 15px; margin-bottom: 10px;">图片链接</label>
+                                    <input class="form-control" data-product-image placeholder="http://..." style="padding: 14px; font-size: 15px;">
+                                </div>
+                                <button class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 16px;" type="submit">保存菜品</button>
+                            </form>
+                            <div class="notice" data-merchant-notice style="display: none; margin-top: 16px; padding: 16px; font-size: 14px;"></div>
+                        </div>
+
+                        <!-- 右侧：列表 -->
+                        <div>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr style="font-size: 16px;">
+                                            <th style="padding: 20px 16px;">ID</th>
+                                            <th style="padding: 20px 16px;">名称</th>
+                                            <th style="padding: 20px 16px;">价格</th>
+                                            <th style="padding: 20px 16px;">状态</th>
+                                            <th style="padding: 20px 16px;">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody data-merchant-products-body style="font-size: 15px;">
+                                        <tr><td colspan="5" style="text-align:center; padding: 60px; color: var(--color-text-muted);">加载中...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </section>
-        </div>
+
+            </div>
+        </main>
     </div>
+    
+    <!-- 为了兼容原有的JS逻辑，引入app.js -->
     <script src="assets/app.js"></script>
+    
+    <!-- 补充样式：兼容 app.js 生成的旧类名 -->
+    <style>
+        /* 增大表格行间距 */
+        .table td {
+            padding: 20px 16px !important;
+        }
+
+        /* 兼容 app.js 中的 .status 类 */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .status.pending { background: var(--color-warning-bg); color: var(--color-warning); }
+        .status.completed { background: var(--color-success-bg); color: var(--color-success); }
+        .status.delivering { background: #e1ecff; color: #3466d6; }
+        
+        /* 兼容 app.js 中的 .notice 类 */
+        .notice {
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            background: var(--color-warning-bg);
+            color: var(--color-warning);
+            font-size: 13px;
+        }
+        .notice.success {
+            background: var(--color-success-bg);
+            color: var(--color-success);
+        }
+    </style>
 </body>
 </html>

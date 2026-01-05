@@ -3,104 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>外卖点餐系统 · 我的订单</title>
-    <!-- 引入新的设计系统样式 -->
+    <title>外卖点餐系统 · 商家订单</title>
     <link rel="stylesheet" href="assets/reference.css">
-    <!-- 引入字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-layout">
-        <!-- 1. 侧边导航栏 -->
+    <div class="app-layout" data-merchant-dashboard>
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="#" class="brand">外卖点餐系统</a>
             </div>
             <nav class="sidebar-nav">
-                <a href="menu.html" class="nav-item">
-                    <span class="nav-icon">🛒</span>
-                    点餐中心
+                <a href="merchant.html" class="nav-item">
+                    <span class="nav-icon">🍔</span>
+                    我的菜品
                 </a>
-                <a href="orders.html" class="nav-item active">
-                    <span class="nav-icon">📜</span>
-                    我的订单
+                <a href="merchant-orders.html" class="nav-item active">
+                    <span class="nav-icon">📦</span>
+                    订单处理
                 </a>
             </nav>
         </aside>
 
-        <!-- 2. 主内容区域 -->
         <main class="main-content">
-            <!-- 顶部栏 -->
             <header class="top-header">
                 <div class="breadcrumbs">
-                    用户中心 / 我的订单
+                    商家中心 / 订单管理
                 </div>
                 <div class="user-profile" style="position: relative; cursor: pointer;" data-user-dropdown-trigger>
-                    <div class="avatar">用</div>
-                    <span style="font-weight: 500; font-size: 14px;" id="userNameDisplay">用户</span>
-                    <!-- Dropdown -->
+                    <div class="avatar">商</div>
+                    <span style="font-weight: 500; font-size: 14px;">商家</span>
                     <div class="dropdown-menu" id="userDropdown">
-                        <a href="#" class="dropdown-item">个人中心</a>
+                        <a href="#" class="dropdown-item">店铺设置</a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item text-danger" data-logout>退出登录</button>
                     </div>
                 </div>
             </header>
 
-            <!-- 内容容器 -->
             <div class="content-wrapper" style="max-width: 1600px;">
-                
-                <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
-                    <div>
-                        <h1 style="font-size: 32px; font-weight: 700; margin: 0 0 10px;">我的订单</h1>
-                        <p style="margin: 0; color: var(--color-text-muted); font-size: 16px;">追踪您的每一份美味，查看历史消费记录。</p>
-                    </div>
-                    <div>
-                        <button class="btn btn-primary" data-refresh-orders style="padding: 12px 24px; font-size: 15px;">刷新订单列表</button>
-                    </div>
+                <div style="margin-bottom: 40px;">
+                    <h1 style="font-size: 32px; font-weight: 700; margin: 0 0 10px;">订单处理</h1>
+                    <p style="margin: 0; color: var(--color-text-muted); font-size: 16px;">查看并处理您的门店订单。</p>
                 </div>
 
-                <!-- 订单列表卡片 -->
-                <div class="card" style="padding: 32px; border-radius: var(--radius-lg);">
-                    <div class="notice" data-orders-notice style="display: none; margin-bottom: 24px;"></div>
-                    
+                <!-- 订单处理卡片 -->
+                <div class="card" id="orders" style="padding: 32px; border-radius: var(--radius-lg);">
+                    <div class="card-header">
+                        <h3 class="card-title" style="font-size: 24px; font-weight: 700;">实时订单列表</h3>
+                        <button class="btn btn-secondary btn-sm" data-merchant-refresh-orders style="padding: 10px 20px; font-size: 14px;">刷新订单</button>
+                    </div>
+                    <div class="notice" data-merchant-notice style="display: none; margin-bottom: 24px;"></div>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr style="font-size: 16px;">
                                     <th style="padding: 20px 16px;">订单号</th>
-                                    <th style="padding: 20px 16px;">商家</th>
-                                    <th style="padding: 20px 16px;">下单时间</th>
-                                    <th style="padding: 20px 16px;">总金额</th>
-                                    <th style="padding: 20px 16px;">订单状态</th>
-                                    <th style="padding: 20px 16px;">支付操作</th>
+                                    <th style="padding: 20px 16px;">用户ID</th>
+                                    <th style="padding: 20px 16px;">金额</th>
+                                    <th style="padding: 20px 16px;">状态</th>
+                                    <th style="padding: 20px 16px;">更新状态</th>
+                                    <th style="padding: 20px 16px;">操作</th>
                                 </tr>
                             </thead>
-                            <tbody data-orders-table style="font-size: 15px;">
-                                <tr><td colspan="6" style="text-align:center; padding: 60px; color: var(--color-text-muted);">正在加载您的订单...</td></tr>
+                            <tbody data-merchant-orders-body style="font-size: 15px;">
+                                <tr><td colspan="6" style="text-align:center; padding: 60px; color: var(--color-text-muted);">点击刷新加载订单</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
         </main>
     </div>
     
-    <!-- 引入 app.js -->
     <script src="assets/app.js"></script>
-    <script>
-        // 简单脚本，显示当前登录用户名
-        document.addEventListener('DOMContentLoaded', () => {
-            const name = localStorage.getItem("userName") || "用户";
-            const display = document.getElementById("userNameDisplay");
-            if(display) display.textContent = name;
-        });
-    </script>
-    
-    <!-- 补充样式：兼容 app.js 生成的旧类名 -->
     <style>
         /* 增大表格行间距 */
         .table td {
