@@ -98,4 +98,4 @@ Now listening on: https://localhost:7070
     *   确保 `backend/wwwroot/uploads` 文件夹存在。
 
 ---
-&copy; 2026 软件工程课程设计
+
