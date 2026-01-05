@@ -62,8 +62,20 @@
 
                     <div class="notice" data-menu-notice style="display: none;"></div>
                     <button class="btn full" type="button" data-order-submit>确认下单</button>
-                    <button class="btn secondary full" type="button" data-logout>退出登录</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 支付弹窗 -->
+    <div class="modal-overlay" data-payment-modal style="display: none;">
+        <div class="modal-card card">
+            <h3 class="section-title">支付确认</h3>
+            <p class="muted" style="margin: 6px 0 10px;">订单已创建，是否前往支付？</p>
+            <p style="margin: 0 0 12px;">订单金额：<strong data-modal-amount>￥0.00</strong></p>
+            <div class="modal-actions">
+                <button class="btn secondary" type="button" data-modal-close>稍后支付</button>
+                <button class="btn" type="button" data-modal-pay>去支付</button>
             </div>
         </div>
     </div>

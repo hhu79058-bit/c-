@@ -237,11 +237,16 @@ function bindMenuPage() {
     const merchantLabel = document.querySelector("[data-current-merchant]");
     const clearCartBtn = document.querySelector("[data-clear-cart]");
     const logoutBtn = document.querySelector("[data-logout]");
+    const paymentModal = document.querySelector("[data-payment-modal]");
+    const modalCloseBtn = document.querySelector("[data-modal-close]");
+    const modalPayBtn = document.querySelector("[data-modal-pay]");
+    const modalAmount = document.querySelector("[data-modal-amount]");
 
     let cart = [];
     let currentMerchantId = null;
     let productCache = new Map();
     let merchantMap = new Map();
+    let lastOrderId = null;
 
     if (logoutBtn) {
         logoutBtn.addEventListener("click", () => {
@@ -281,38 +286,86 @@ function bindMenuPage() {
         });
     }
 
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener("click", () => {
+            if (paymentModal) paymentModal.style.display = "none";
+        });
+    }
+
+    if (modalPayBtn) {
+        modalPayBtn.addEventListener("click", async () => {
+            if (!lastOrderId) {
+                if (paymentModal) paymentModal.style.display = "none";
+                return;
+            }
+            try {
+                await apiFetch(`/api/payments/${lastOrderId}/pay`, {
+                    method: "POST",
+                    body: JSON.stringify({ paymentMethod: "在线支付" })
+                });
+                setNotice(notice, "支付成功", true);
+                if (paymentModal) paymentModal.style.display = "none";
+            } catch (error) {
+                setNotice(notice, error.message);
+            }
+        });
+    }
+
     document.body.addEventListener("click", async (event) => {
         const target = event.target;
         if (!(target instanceof HTMLElement)) return;
         const productId = target.dataset.addProduct;
-        if (!productId) return;
+        const incId = target.dataset.cartInc;
+        const decId = target.dataset.cartDec;
 
-        try {
-            let product = productCache.get(Number(productId));
-            if (!product) {
-                product = await apiFetch(`/api/products?merchantId=${currentMerchantId || 0}`)
-                    .then((items) => items.find((item) => item.productId === Number(productId)));
-                if (product) {
-                    productCache.set(product.productId, product);
+        // 新增菜品到购物车
+        if (productId) {
+            try {
+                let product = productCache.get(Number(productId));
+                if (!product) {
+                    product = await apiFetch(`/api/products?merchantId=${currentMerchantId || 0}`)
+                        .then((items) => items.find((item) => item.productId === Number(productId)));
+                    if (product) {
+                        productCache.set(product.productId, product);
+                    }
+                }
+                if (!product) return;
+
+                const existing = cart.find((item) => item.productId === product.productId);
+                if (existing) {
+                    existing.quantity += 1;
+                } else {
+                    cart.push({
+                        productId: product.productId,
+                        name: product.productName,
+                        price: Number(product.price),
+                        quantity: 1
+                    });
+                }
+                renderCart();
+            } catch (error) {
+                setNotice(notice, error.message);
+            }
+            return;
+        }
+
+        // 购物车内 +/-
+        if (incId || decId) {
+            const id = Number(incId || decId);
+            const item = cart.find((c) => c.productId === id);
+            if (!item) return;
+
+            if (incId) {
+                item.quantity += 1;
+            } else if (decId) {
+                item.quantity -= 1;
+                if (item.quantity <= 0) {
+                    cart = cart.filter((c) => c.productId !== id);
                 }
             }
-            if (!product) return;
-
-            const existing = cart.find((item) => item.productId === product.productId);
-            if (existing) {
-                existing.quantity += 1;
-            } else {
-                cart.push({
-                    productId: product.productId,
-                    name: product.productName,
-                    price: Number(product.price),
-                    quantity: 1
-                });
-            }
             renderCart();
-        } catch (error) {
-            setNotice(notice, error.message);
         }
+
     });
 
     function renderCart() {
@@ -331,7 +384,11 @@ function bindMenuPage() {
                         <div class="cart-line-name">${item.name}</div>
                         <div class="cart-line-meta">￥${item.price.toFixed(2)} / 份</div>
                     </div>
-                    <div class="cart-line-qty">x${item.quantity}</div>
+                    <div class="cart-line-qty">
+                        <button class="cart-qty-btn" data-cart-dec="${item.productId}">-</button>
+                        <span>x${item.quantity}</span>
+                        <button class="cart-qty-btn" data-cart-inc="${item.productId}">+</button>
+                    </div>
                     <div class="cart-line-price">￥${(item.price * item.quantity).toFixed(2)}</div>
                 </div>
             `
@@ -360,6 +417,7 @@ function bindMenuPage() {
             }
 
             try {
+                const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
                 await apiFetch("/api/orders", {
                     method: "POST",
                     body: JSON.stringify({
@@ -370,10 +428,14 @@ function bindMenuPage() {
                             quantity: item.quantity
                         }))
                     })
+                }).then((res) => {
+                    lastOrderId = res?.orderId;
                 });
                 cart = [];
                 renderCart();
                 setNotice(notice, "订单创建成功", true);
+                if (modalAmount) modalAmount.textContent = `￥${totalAmount.toFixed(2)}`;
+                if (paymentModal) paymentModal.style.display = "flex";
             } catch (error) {
                 setNotice(notice, error.message);
             }
@@ -404,6 +466,16 @@ async function renderOrders() {
                     4: { label: "已取消", cls: "pending" }
                 };
                 const status = statusMap[order.orderStatus] || { label: "未知", cls: "pending" };
+                const payStatusMap = {
+                    0: { label: "待支付", cls: "pending" },
+                    1: { label: "已支付", cls: "completed" },
+                    2: { label: "支付失败", cls: "pending" }
+                };
+                const payStatus = payStatusMap[order.payStatus] || { label: "未知", cls: "pending" };
+                const payAction = order.payStatus === 0
+                    ? `<button class="btn secondary" data-pay-order="${order.orderId}">去支付</button>`
+                    : `<span class="status ${payStatus.cls}">${payStatus.label}</span>`;
+
                 return `
                     <tr>
                         <td>#${order.orderNumber}</td>
@@ -411,6 +483,7 @@ async function renderOrders() {
                         <td>${new Date(order.orderTime).toLocaleString()}</td>
                         <td>￥${Number(order.orderAmount).toFixed(2)}</td>
                         <td><span class="status ${status.cls}">${status.label}</span></td>
+                        <td>${payAction}</td>
                     </tr>
                 `;
             })
@@ -420,6 +493,29 @@ async function renderOrders() {
         setNotice(notice, error.message || "加载订单失败");
         table.innerHTML = `<tr><td colspan="5">暂无订单</td></tr>`;
     }
+}
+
+function bindOrderPayments() {
+    const table = document.querySelector("[data-orders-table]");
+    if (!table) return;
+
+    document.body.addEventListener("click", async (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const payId = target.dataset.payOrder;
+        if (!payId) return;
+        const notice = document.querySelector("[data-orders-notice]");
+        try {
+            await apiFetch(`/api/payments/${payId}/pay`, {
+                method: "POST",
+                body: JSON.stringify({ paymentMethod: "在线支付" })
+            });
+            setNotice(notice, "支付成功", true);
+            renderOrders();
+        } catch (error) {
+            setNotice(notice, error.message || "支付失败");
+        }
+    });
 }
 
 async function loadSummary() {
@@ -851,6 +947,7 @@ document.addEventListener("DOMContentLoaded", () => {
     bindLogin();
     bindMenuPage();
     renderOrders();
+    bindOrderPayments();
     bindAdminDashboard();
     bindMerchantDashboard();
 

@@ -444,5 +444,23 @@ namespace WaiMai.Backend.Services
             Random random = new Random();
             return DateTime.Now.ToString("yyyyMMddHHmmss") + random.Next(10000, 99999);
         }
+
+        /// <summary>
+        /// 根据订单ID获取订单
+        /// </summary>
+        /// <param name="orderId">订单ID</param>
+        /// <returns>订单对象，不存在返回null</returns>
+        public async Task<Order?> GetOrderByIdAsync(int orderId)
+        {
+            using SqlConnection connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            using SqlCommand command = new SqlCommand("SELECT * FROM [Order] WHERE OrderID = @OrderID", connection);
+            command.Parameters.AddWithValue("@OrderID", orderId);
+            using SqlDataAdapter adapter = new SqlDataAdapter(command);
+            DataTable table = new DataTable();
+            adapter.Fill(table);
+            if (table.Rows.Count == 0) return null;
+            return MapOrder(table.Rows[0]);
+        }
     }
 }
